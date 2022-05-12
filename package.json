@@ -1,0 +1,16 @@
+{
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "handlebars": "^4.7.7",
+    "hbs": "^4.2.0",
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  },
+  "scripts": {
+    "start": "nodemon"
+  }
+}
