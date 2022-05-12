@@ -9,7 +9,6 @@ const db = require('./db/index');
 async function main() {
   db.connect();
   server.start();
-  db.createUsers({ name: 'sauce', pass: 'suce', mail: 'soos' });
 }
 
 main();
