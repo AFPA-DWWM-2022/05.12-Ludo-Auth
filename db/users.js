@@ -7,22 +7,32 @@
 'use strict';
 
 const { _db } = require('./connection');
-const select = require('./requestFactories');
+const R = require('../factories/genRequest');
+const { asArray } = require('../helpers');
 
 async function createUsers(fields) {
-  if (!fields instanceof Array) fields = [fields];
-
-};
+  for (const req of R.insert('users', asArray(fields)))
+    _db.execute(req, (e) => {
+      if (e) console.trace(`==> User creation failure\n${e}`);
+    });
+}
 
 async function getUsers(fields) {
-  if (!fields instanceof Array) fields = [fields];
-  const req = select('users', fields);
+  const req = R.select('users', asArray(fields));
   const [rows, _] = await _db.promise().execute(req);
   return rows;
-};
+}
+
+async function deleteUsers(fields) {
+  const req = R.delet('users', asArray(fields));
+  _db.execute(req, (e) => {
+    if (e) console.trace(`==> User deletion failure\n${e}`);
+  });
+}
 
 module.exports = {
+  deleteUsers,
   createUsers,
   getUsers,
   hasUsers: async (fields) => !!(await getUsers(fields).length),
-};
+}
