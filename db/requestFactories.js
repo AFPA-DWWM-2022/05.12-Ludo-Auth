@@ -6,6 +6,8 @@
  */
 'use strict';
 
+const { makeIterable } = require('../helpers/index');
+
 function constraint(fields, separator = 'AND') {
   const k = Object.keys(fields);
   var i = k.length - 1;
@@ -40,26 +42,7 @@ async function select(table, fields) {
 async function insert(table, fields) {
   const reqs = [];
 
-  if (!(fields instanceof Array)) fields = [fields];
-
-  fields.map((f) => {
-    Object.assign(f, {
-      *[Symbol.iterator]() {
-        const k = Object.keys(this).sort();
-        let step = 0;
-        return {
-          next() {
-            step += 1;
-            if (step++ >= k.length) return { done: true, value: null };
-            return {
-              done: false,
-              value: { name: k[step], value: this[k[step]] },
-            };
-          },
-        };
-      },
-    });
-  });
+  if (!(fields instanceof Array)) fields = [fields].map(makeIterable);
 
   for (const f of fields) {
     const names = [];
