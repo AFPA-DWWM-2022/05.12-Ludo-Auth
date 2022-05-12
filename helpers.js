@@ -7,9 +7,7 @@
 'use strict';
 
 module.exports = {
-  asArray: (o) => {
-    o instanceof Array ? o : [o];
-  },
+  asArray: (o) => (o instanceof Array ? o : [o]),
 
   makeIterable: (o) => {
     o[Symbol.iterator] = function* () {
