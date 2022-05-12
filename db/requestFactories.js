@@ -6,17 +6,16 @@
  */
 'use strict';
 
-const { makeIterable } = require('../helpers/index');
+const { makeIterable, asArray } = require('../helpers');
 
 function constraint(fields, separator = 'AND') {
-  const k = Object.keys(fields);
+  const k = Object.keys(fields.reverse());
   var i = k.length - 1;
   var c = '';
 
-  separator = ` ${separator} `;
   while (true) {
     c += `${k[i]} LIKE '${fields[k[i]]}'`;
-    if (--i >= 0) c += separator;
+    if (--i >= 0) c += ` ${separator} `;
     else break;
   }
 
@@ -24,7 +23,7 @@ function constraint(fields, separator = 'AND') {
 }
 
 async function select(table, fields) {
-  if (!fields instanceof Array) fields = [fields];
+  fields = asArray(fields).reverse();
 
   var req = `SELECT * FROM ${table}`;
   var i = fields.reverse().length;
@@ -42,25 +41,22 @@ async function select(table, fields) {
 async function insert(table, fields) {
   const reqs = [];
 
-  if (!(fields instanceof Array)) fields = [fields].map(makeIterable);
-
-  for (const f of fields) {
+  for (const f of asArray(fields)) {
     const names = [];
     const values = [];
 
-    for (const _ of f) {
-      names.push(names);
-      values.push(values);
+    for (const [n, v] of makeIterable(f)) {
+      names.push(n);
+      values.push(v);
     }
     reqs.push(
-      `INSERT INTO ${table} (${names.join(', ')}) VALUES (${values.join(', ')})`
+      `INSERT INTO ${table} (${names.join(', ')})\n` +
+        `VALUES (${values.map((v) => `'${v}'`).join(', ')})`
     );
   }
-  console.log([reqs]);
+
   return reqs;
 }
-
-insert('users', { name: 'pute', mail: 'sause@aa', pass: '123' });
 
 module.exports = {
   select,
