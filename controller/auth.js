@@ -9,14 +9,14 @@
 const { ifError } = require('assert');
 const bcrypt = require('bcrypt');
 
-const { createUsers } = require('../db/index');
+const { createUsers, hasUsers } = require('../db/index');
 
 const _RE = {
   /** At least 8 characters, with at least one occurence of {alpha, num, special} */
   pass: /^(?=.*\w)(?=.*\d)(?=.*\W).{8,}$/,
 
   /** Only one @, at least one character on each side, and a . at the end*/
-  mail: /^[^@]+@[^@]+\./
+  mail: /^[^@]+@[^@]+\./,
 };
 
 module.exports = {
@@ -24,10 +24,9 @@ module.exports = {
     var e = undefined;
     const { name, mail, pass, chck } = req.body;
 
-    console.log(_RE.mail.test('jobijoba@job.com'));
-    console.log(mail, name, pass, chck);
-
-    if (!_RE.mail.test(mail)) {
+    if (hasUsers(mail)) {
+      e = 'User already exists !';
+    } else if (!_RE.mail.test(mail)) {
       e = 'Invalid email !';
     } else if (!_RE.pass.test(pass)) {
       e = 'Invalid password !';
